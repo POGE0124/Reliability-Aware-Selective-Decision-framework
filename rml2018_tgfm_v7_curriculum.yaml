@@ -1,0 +1,79 @@
+seed: 123
+device: cuda
+
+paths:
+  data_root: data
+  rml2018_h5: data/RML2018/GOLD_XYZ_OSC.0001_1024.hdf5
+  split_path: splits/rml2018_seed123.npz
+  output_root: runs
+  cache_root: cache
+
+data:
+  signal_length: 1024
+  num_classes: 24
+  train_ratio: 0.8
+  val_ratio: 0.1
+  teacher_snr_min: 0
+  high_snr_min: 0
+  source_snrs: [-10, -8, -6, -4, -2, 0]
+  eval_snrs: [-20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+
+teacher:
+  dim: 512
+  z_dim: 512
+  depth: 8
+  heads: 8
+  mlp_ratio: 4.0
+  dropout: 0.05
+  max_tokens: 512
+  batch_size: 1024
+  epochs: 50
+  early_stop_patience: 8
+  lr: 0.0004
+  min_lr: 0.000001
+  weight_decay: 0.01
+  warmup_epochs: 5
+  grad_clip: 1.0
+  num_workers: 8
+  prefetch_factor: 2
+  amp: true
+
+cache:
+  shard_size: 32768
+  dtype: float16
+  batch_size: 1024
+  num_workers: 8
+
+curriculum:
+  samples_per_class: 2048
+  normalize: false
+  target_alpha: 0.5
+  stages:
+    - name: s0_reliable_0_4
+      target_snrs: [0, 2, 4]
+      source_snrs: [-10, -8, -6]
+    - name: s1_reliable_4_8
+      target_snrs: [4, 6, 8]
+      source_snrs: [-4, -2]
+    - name: s2_reliable_8_12
+      target_snrs: [8, 10, 12]
+      source_snrs: [0]
+
+alignment:
+  batch_size: 8192
+  epochs: 50
+  lr: 0.0002
+  min_lr: 0.000001
+  weight_decay: 0.01
+  early_stop_patience: 8
+  grad_clip: 1.0
+  amp: true
+  flow_steps: 8
+  velocity_weight: 1.0
+  lambda_cls: 1.0
+  lambda_feat: 0.2
+
+eval:
+  batch_size: 1024
+  num_workers: 8
+  gated: true
