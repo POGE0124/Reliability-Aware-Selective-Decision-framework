@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tgfm-research"
+version = "0.1.0"
+description = "Research implementation of TGFM for automatic modulation classification"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "h5py>=3.8",
+  "numpy>=1.24",
+  "PyYAML>=6.0",
+  "torch>=2.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
